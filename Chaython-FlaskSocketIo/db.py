@@ -1,3 +1,5 @@
+import string
+import random
 from ast import Pass
 from hashlib import md5, new
 from turtle import update
@@ -11,14 +13,20 @@ db = client.Chaython
 
 #--------------------------------------------------------- Rooms ---------------------------------------------------------
 def createRoom(name, userId):
+    if not userId in [id['_id'] for id in getListOf('Users')]:
+        return -1
+
+    roomId = id_generator()
+    while(roomId in [id['_id'] for id in getListOf('Rooms')]):
+        roomId = id_generator()
+
     room = {
-        "_id": GetNextId('Rooms'),
+        "_id": roomId,
         "name": name,
-        "user_id": userId
+        "user_id": userId,
+        "active": True
     }
-
-
-
+    return db.Rooms.insert_one(room).inserted_id
 
 
 #--------------------------------------------------------- Users ---------------------------------------------------------
@@ -44,18 +52,23 @@ def getUserId(name):
             return u['_id']
     return -1
 
-def getListOf(collection):
-    newList = [newList.append(p) for p in db[collection].find()]
-    return newList
 
 #--------------------------------------------------------- Otro ---------------------------------------------------------
+def getListOf(collection):
+    newList = []
+    [newList.append(p) for p in db[collection].find()]
+    return newList
+
 def GetNextId(collection):
     return 0 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
 
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 # print(registerUser('Alan2', 'uiiiii'))
 # print(logIn('Alan2', 'uiiiii'))
 # print(getUserId('Alan2'))
+# createRoom('rumsita buena', 3)
 
 
 
