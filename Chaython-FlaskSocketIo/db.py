@@ -1,7 +1,10 @@
+from dataclasses import asdict
 import string
 import random
+import json
 from ast import Pass
 from hashlib import md5, new
+from textwrap import indent
 from turtle import update
 from unittest import result
 from pymongo import MongoClient
@@ -12,12 +15,29 @@ db = client.Chaython
 
 
 #--------------------------------------------------------- Rooms ---------------------------------------------------------
+# def createRoom(name, userId):
+#     if not userId in [id['_id'] for id in getListOf('Users')]:
+#         return -1
+
+#     roomId = id_generator()
+#     while(roomId in [id['_id'] for id in getListOf('Rooms')]):
+#         roomId = id_generator()
+
+#     room = {
+#         "_id": roomId,
+#         "name": name,
+#         "user_id": userId,
+#         "active": True
+#     }
+#     return db.Rooms.insert_one(room).inserted_id
+
+#--------------------------------------------------------- Rooms ---------------------------------------------------------
 def createRoom(name, userId):
-    if not userId in [id['_id'] for id in getListOf('Users')]:
+    if getDocumentById('Users', userId) == None:
         return -1
 
     roomId = id_generator()
-    while(roomId in [id['_id'] for id in getListOf('Rooms')]):
+    while(getDocumentById('Rooms', roomId) != None):
         roomId = id_generator()
 
     room = {
@@ -28,6 +48,14 @@ def createRoom(name, userId):
     }
     return db.Rooms.insert_one(room).inserted_id
 
+def setRoomActive(roomId, active = True):
+    room = getDocumentById('Rooms', roomId)
+    if room == None: return -1
+    room['active'] = active
+    return  db.Rooms.update_one({'_id': roomId}, {'$set': room}).raw_result
+
+def getRoomsByUser(userId):
+    return [r for r in db.Rooms.find({'user_id': userId}, {})]
 
 #--------------------------------------------------------- Users ---------------------------------------------------------
 def registerUser(name, passwd):
@@ -36,28 +64,22 @@ def registerUser(name, passwd):
     "name": name,
     "pass": md5(passwd.encode()).hexdigest(),
     }
-    userNames = [u['name'] for u in getListOf('Users')]
-    return -1 if name in userNames else db.Users.insert_one(user).inserted_id
+    return -1 if db.Users.find_one({'name': name}, {}) == None else db.Users.insert_one(user).inserted_id
 
 def logIn(name, passwd):
-    userList = getListOf('Users')
-    for u in userList:
-        if u['name'] == name and u['pass'] == md5(passwd.encode()).hexdigest():
-            return u['_id']
-    return -1
+    return db.Users.find_one({'name': name, 'pass': passwd}, {})
 
 def getUserId(name):
-    for u in getListOf('Users'):
-        if u['name'] == name:
-            return u['_id']
-    return -1
+    user = db.Users.find_one({'name': name}, {})
+    return -1 if user == None else user['_id']
 
 
 #--------------------------------------------------------- Otro ---------------------------------------------------------
+def getDocumentById(collection, id):
+    return db[collection].find_one({'_id': id}, {})
+
 def getListOf(collection):
-    newList = []
-    [newList.append(p) for p in db[collection].find()]
-    return newList
+    return [p for p in db[collection].find()]
 
 def GetNextId(collection):
     return 0 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
@@ -69,6 +91,14 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 # print(logIn('Alan2', 'uiiiii'))
 # print(getUserId('Alan2'))
 # createRoom('rumsita buena', 3)
+# print(getCollectionById('Users', 4))
+# print(getListOf('Rooms'))
+# print(setRoomActive('MXB3I6', False))
+# createRoom('room0', 0)
+# createRoom('room1', 0)
+# createRoom('room2', 1)
+# createRoom('room3', 0)
+print(json.dumps(getRoomsByUser(1), indent = 4))
 
 
 
@@ -77,34 +107,6 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 
 
-
-
-
-
-
-
-
-
-# new_user =  {
-#     "_id": GetLastId('Users') + 1,
-#     "name": "Chayton",
-#     "password": md5("1234".encode()).hexdigest(),
-# }
-# result = db.Users.insert_one(new_user)
-# print(result)
-
-# filter = {'user': 'admin'}
-# projection = {}
-# user = db.test.find_one(filter, projection)
-# print(user)
-
-
-
-# filter = {}
-# projection = {'user': 1, '_id': 0}
-# users = db.test.find(filter, projection)
-# for u in users:
-#     print(u)
 
 # # Creamos un usuario
 
@@ -118,6 +120,11 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 # update = {'$set': {'nick': 'admin', 'login': True}}
 # result = db.test.update_one(filter, update)
 
+# filter = {'user': 'admin'}
+# projection = {}
+# user = db.test.find_one(filter, projection)
+# print(user)
+
 #
 
 
@@ -130,9 +137,4 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 #     "user_id": 1,
 #     "message": "Hola, soy Chayton",
 #     "date": "2020-01-01 00:00:00"
-# }
-
-# room = {
-#     "_id": 1,
-#     "name": "Chayton First Room",
 # }
