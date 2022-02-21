@@ -64,10 +64,10 @@ def registerUser(name, passwd):
     "name": name,
     "pass": md5(passwd.encode()).hexdigest(),
     }
-    return -1 if db.Users.find_one({'name': name}, {}) == None else db.Users.insert_one(user).inserted_id
+    return -1 if db.Users.find_one({'name': name}, {}) != None else db.Users.insert_one(user).inserted_id
 
 def logIn(name, passwd):
-    return db.Users.find_one({'name': name, 'pass': passwd}, {})
+    return db.Users.find_one({'name': name, 'pass': md5(passwd.encode()).hexdigest()}, {})
 
 def getUserId(name):
     user = db.Users.find_one({'name': name}, {})
@@ -82,7 +82,7 @@ def getListOf(collection):
     return [p for p in db[collection].find()]
 
 def GetNextId(collection):
-    return 0 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
+    return 1 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -98,7 +98,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 # createRoom('room1', 0)
 # createRoom('room2', 1)
 # createRoom('room3', 0)
-print(json.dumps(getRoomsByUser(1), indent = 4))
+# print(json.dumps(getRoomsByUser(1), indent = 4))
 
 
 
