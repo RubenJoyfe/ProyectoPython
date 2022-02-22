@@ -11,10 +11,19 @@
     <body class="text-center">
         <form class="form-signin" action="{{url_for('chat')}}" method="POST">
             <h1 class="h2 mb-3 font-weight-normal">Chayton API's Chat</h1><br><br>
-            <input type="text" id="username" name="name" class="form-control" placeholder="Username" required autofocus><br>
-            <input type="text" id="pass" name="password" class="form-control" placeholder="Password" required><br>
+            <input type="text" id="username" name="name" class="form-control" placeholder="Username" required autocomplete="off" autofocus><br>
+            <input type="password" id="pass" name="password" class="form-control" placeholder="Password" required autocomplete="off"><br>
             <button class="btn btn-lg btn-primary btn-block" value="submit">Start Chat</button>
         </form>
     </body>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const error = urlParams.get('error')
+        if (error == 1) {
+            const error_message = "<div class='errorCont'><p class='error'>Error: Usuario o contraseña incorrectos</p></div>";
+            document.getElementsByClassName('form-signin')[0].innerHTML += error_message;
+        }
+    </script>
 
 </html>
