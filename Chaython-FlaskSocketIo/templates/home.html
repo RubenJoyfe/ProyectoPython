@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+
+    <head>
+        <title>Chayton API's Chat</title>
+        <!--Link to CSS -->
+        <link href="../static/bootstrap.min.css" rel="stylesheet">
+        <link href="../static/style.css" rel="stylesheet">
+        <link href="../static/home.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="content_display">
+            <div class="chats_viewer">
+                <div class="viewer_item user">
+                    <div class="user-profile">
+                        <span id="name_letter"></span>
+                    </div>
+                    <p id="user_name" class="font_strong">{{session['name']}}</p>
+                </div>
+            </div>
+            <div class="room_creator text-center">
+                <form class="form-signin" action="{{url_for('chat')}}" method="POST">
+                    <h1 class="h2 mb-3 font-weight-strong">Chayton API's Chat</h1>
+                    <br>
+                    <div id="chats">{{session['chats']}}</div>
+                    <br>
+                    <input type="text" id="RoomName" name="room" class="form-control" placeholder="Sala" required autocomplete="off" autofocus><br>
+                    <button class="btn btn-lg btn-primary btn-block" value="submit">Crear Sala</button>
+                    <button class="btn btn-lg btn-secondary btn-block" value="submit">Unirse a Sala</button>
+                </form>
+            </div>
+        </div>
+        
+    </body>
+    <script>
+        const buttons = document.getElementsByClassName('btn-block');
+        for (let index = 0; index < buttons.length; index++) {
+            const uname = document.getElementById('user_name').innerHTML;
+            const name_letter = uname.charAt(0);
+            document.getElementById('name_letter').innerHTML = name_letter;
+
+            buttons[index].addEventListener('click', function () {
+                const roomName = document.getElementById('RoomName').value;
+                if (roomName == '') {
+                    alert('El nombre de la sala no puede estar vacia');
+                    preventDefault();
+                }
+            });            
+        }
+    </script>
+
+</html>

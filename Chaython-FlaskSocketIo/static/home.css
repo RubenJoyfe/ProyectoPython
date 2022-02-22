@@ -1,0 +1,80 @@
+::-webkit-scrollbar {
+    width: 0.2rem;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 25px;
+    background: rgb(179, 179, 179);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(122, 122, 122); 
+}
+
+body{
+    padding: 0;
+    margin: 0;
+}
+
+.content_display{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.chats_viewer{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 20vw;
+    background-color: #4155af;
+}
+.room_creator{
+    display: flex;
+    height: 100%;
+    width: 80vw;
+    background-color: #619bdd;
+    color: white;
+}
+.chats_viewer,
+.room_creator{
+    overflow-y: auto;
+}
+
+.viewer_item{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: fit-content;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-bottom: 1px solid #2a3c8b;
+    cursor: pointer;
+}
+.viewer_item:hover{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.viewer_item.user{
+    color: white;
+}
+.user-profile{
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-color: #2a3c8b;
+    margin: 0 15px 0 0;
+    padding: 0;
+}
+.user-profile > #name_letter{
+    margin: 0;
+    padding: 0;
+    font-size: 50px;
+}
+.font_strong{
+    font-weight: bold;
+}
