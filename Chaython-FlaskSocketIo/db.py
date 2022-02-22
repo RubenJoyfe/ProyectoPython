@@ -191,7 +191,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 # for a in getMessagesByChat(1):
 #     print(a)
 
-print(getChatsByUser(1))
+# print(getChatsByUser(1))
 
 
 
