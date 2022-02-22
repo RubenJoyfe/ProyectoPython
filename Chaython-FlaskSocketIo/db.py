@@ -1,7 +1,9 @@
 from dataclasses import asdict
 import string
+from datetime import datetime
 import random
 import json
+import operator
 from ast import Pass
 from hashlib import md5, new
 from textwrap import indent
@@ -13,34 +15,53 @@ client = MongoClient('mongodb://localhost:27017/?readPreference=primary&appname=
 db = client.Chaython
 
 
-#--------------------------------------------------------- Rooms ---------------------------------------------------------
-msg = {
-    "_id": 1,
-    "room_id": 1,
-    "user_id": 1,
-    "message": "Hola, soy Chayton",
-    "date": "2020-01-01 00:00:00"
-}
+#--------------------------------------------------------- Messages ---------------------------------------------------------
 
-# def createRoom(name, userId):
-#     if not userId in [id['_id'] for id in getListOf('Users')]:
-#         return -1
+def createMessageChat(userId, chatId, msg, date = datetime.now()):
+    chat = getDocumentById("Chats", chatId)
+    user = getDocumentById("Users", userId)
+    if chat is None or user is None or userId not in chat["users"]: return -1
+    message = {
+        "_id": GetNextId("Messages"),
+        "user_id": userId,
+        "chat_id": chatId,
+        "room_id": None,
+        "message": msg,
+        "date": date
+    }
+    return db.Messages.insert_one(message).inserted_id
 
-#     roomId = id_generator()
-#     while(roomId in [id['_id'] for id in getListOf('Rooms')]):
-#         roomId = id_generator()
+def createMessageRoom(userId, roomId, msg, date = datetime.now()):
+    room = getDocumentById("Rooms", roomId)
+    user = getDocumentById("Users", userId)
+    if room is None or user is None or userId not in room["users"]: return -1
+    message = {
+        "_id": GetNextId("Messages"),
+        "user_id": userId,
+        "chat_id": None,
+        "room_id": roomId,
+        "message": msg,
+        "date": date
+    }
+    return db.Messages.insert_one(message).inserted_id
 
-#     room = {
-#         "_id": roomId,
-#         "name": name,
-#         "user_id": userId,
-#         "active": True
-#     }
-#     return db.Rooms.insert_one(room).inserted_id
+def getMessagesByChat(chatId):
+    if getDocumentById("Chats", chatId) is None: return -1
+    l = [ m for m in db.Messages.find({'chat_id': chatId}, {})]
+    l.sort(key=operator.itemgetter('date'))
+    for m in l:
+        m["name"] = getDocumentById("Users", m["user_id"])["name"]
+    return l
 
+def getMessagesByRoom(roomId):
+    if getDocumentById("Rooms", roomId) is None: return -1
+    l = [ m for m in db.Messages.find({'room_id': roomId}, {})]
+    l.sort(key=operator.itemgetter('date'))
+    for m in l:
+        m["name"] = getDocumentById("Users", m["user_id"])["name"]
+    return l
 
 #--------------------------------------------------------- Chats ---------------------------------------------------------
-
 
 def createChat(users):
     if len(users) < 2: return -1
@@ -57,6 +78,15 @@ def createChat(users):
     }
     return db.Chats.insert_one(chat).inserted_id
 
+def getChatsByUser(userId):
+    chats = []
+    for c in db.Chats.find():
+        if userId in c['users']:
+            other = c['users'][0] if c['users'][0] != userId else c['users'][1]
+            c["otherUserId"] = other
+            c["otherUserName"] = getDocumentById("Users", other)["name"]
+            chats.append(c)
+    return chats
 
 #--------------------------------------------------------- Rooms ---------------------------------------------------------
 def createRoom(name, firstUserId):
@@ -153,10 +183,15 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 # print(json.dumps(getRoomsByUser(1), indent = 4))
 # print(setUserToRoom(2, 'W1TCIQ'))
 
-# print(createChat([1,2,3,4]))
-# print(createChat([2,1]))
-# print(createChat([1]))
-# print(createChat([2,6]))
+# print(createMessageChat(11, 1, "AAAAAAAAAAAAAAAA"))
+# print(createMessageChat(1, 22, "BBBBBBBBBBBBBBBB"))
+# print(createMessageChat(2, 1, "CCCCCCCCCCCCCCCC"))
+# print(createMessageChat(1, 1, "DDDDDDDDDDDDDDDD", datetime(2021, 2, 22, 18, 54, 13, 726000)))
+
+# for a in getMessagesByChat(1):
+#     print(a)
+
+print(getChatsByUser(1))
 
 
 
