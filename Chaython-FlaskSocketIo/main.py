@@ -22,15 +22,15 @@ Session(app)
 socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
 # socketio = SocketIO(app, manage_session=False)
 
-def check_auth(redirect_name:str):
-    def decorator(f:str):
+def check_auth(session_item_name:str, redirect_name:str):
+    def decorator(f):
         @wraps(f)
         def wrapper(*args, **kargs):
             try:
-                if(session.get('name') is None):
-                    return redirect(url_for('index'))
-                elif (redirect_name != ''):
+                if(session.get(session_item_name) is None):
                     return redirect(url_for(redirect_name))
+                else: 
+                    return f(*args, **kargs)
             except Exception as e:
                 abort(401)
             pass
@@ -44,10 +44,9 @@ def index():
     return render_template('index.html')
 
 @app.route('/home', methods=['GET', 'POST'])
+@check_auth('name', 'index')
 def home():
-    if(session.get('name') is not None):
-        return render_template('home.html', session = session) # return redirect(url_for('chat'))
-    return redirect(url_for('index'))
+    return render_template('home.html', session = session) # return redirect(url_for('chat'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,12 +69,29 @@ def login():
     return redirect(url_for('index'))
 
 @app.route('/Chaython', methods=['GET', 'POST'])
+@check_auth('name', 'home')
 def chat():
     if (session.get('name') is not None and request.form['room'] is not None):
         session['room'] = request.form['room']
         return render_template('chat.html', session = session)
+    elif (session.get('room') is not None and session.get('room') != ''):
+        return render_template('chat.html', session = session)
     else:
         return redirect(url_for('index'))
+
+@app.route('/Chaython/', methods=['GET'])
+def backToHome():
+    return redirect(url_for('home'))
+
+@app.route('/Chaython/<string:room_id>', methods=['GET'])
+@check_auth('name', 'home')
+def chatbyid(room_id):
+    print('ENTRO')
+    if (room_id is not None):
+        session['room'] = room_id
+        return render_template('chat.html', session = session)
+    else:
+        return redirect(url_for('home'))
 
 # ("/user/<int:user_id>", methods=['GET'])
 @socketio.on('join', namespace='/Chaython')

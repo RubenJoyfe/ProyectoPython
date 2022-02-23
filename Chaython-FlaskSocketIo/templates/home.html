@@ -34,6 +34,8 @@
         
     </body>
     <script>
+        const chats = "{{session['chats']}}";
+        console.log(chats);
         const buttons = document.getElementsByClassName('btn-block');
         for (let index = 0; index < buttons.length; index++) {
             const uname = document.getElementById('user_name').innerHTML;
