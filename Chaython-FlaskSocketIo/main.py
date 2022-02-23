@@ -1,4 +1,5 @@
 from ast import If
+from getpass import getuser
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_session import Session
@@ -46,6 +47,8 @@ def index():
 @app.route('/home', methods=['GET', 'POST'])
 @check_auth('name', 'index')
 def home():
+    uid = session['uid']
+    # session['chats'] = db.getRoomsByUser(uid)
     return render_template('home.html', session = session) # return redirect(url_for('chat'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -59,11 +62,11 @@ def login():
         if u is None:
             # print(db.registerUser(uname, pword))
             return redirect(url_for('index')+'?error=1')
-        user_chats = [{"name": "luk chat"}, {"name": "carl chat"}]
-        token = jwt.encode({"id": u['_id'],"name": u['name']}, JSON_KEY, algorithm='HS256')
+        # token = jwt.encode({"id": u['_id'],"name": u['name']}, JSON_KEY, algorithm='HS256')
+        # session['token'] = token
+        session['uid'] = u['_id']
         session['name'] = uname
-        session['chats'] = user_chats
-        session['token'] = token
+        # session['chats'] = db.getRoomsByUser(u['_id'])
         # jsonify({"name": uname,"token": token}), 200
         return redirect(url_for('home'))
     return redirect(url_for('index'))
@@ -71,10 +74,21 @@ def login():
 @app.route('/Chaython', methods=['GET', 'POST'])
 @check_auth('name', 'home')
 def chat():
-    if (session.get('name') is not None and request.form['room'] is not None):
+    if (request.form['room'] is not None and request.form['room_action'] is not None):
         session['room'] = request.form['room']
+        room_action = request.form['room_action']
+        if(room_action == 'create'):
+            session['room_key'] = db.createRoom(session['room'],session['uid'])
+        elif(room_action == 'join'):
+            session['room_key'] = session['room']
+            res = db.setUserToRoom(session['uid'], session['room_key'])
+            if(res == -1):
+                return redirect(url_for('home'))
+            roomInfo = db.getDocumentById('Rooms', session['room_key'])
+            session['room'] = roomInfo['name']
+
         return render_template('chat.html', session = session)
-    elif (session.get('room') is not None and session.get('room') != ''):
+    elif (session.get('room_key') is not None and session.get('room_key') != ''):
         return render_template('chat.html', session = session)
     else:
         return redirect(url_for('index'))
@@ -83,38 +97,47 @@ def chat():
 def backToHome():
     return redirect(url_for('home'))
 
-@app.route('/Chaython/<string:room_id>', methods=['GET'])
+@app.route('/Chaython/<string:room_key>', methods=['GET'])
 @check_auth('name', 'home')
-def chatbyid(room_id):
-    print('ENTRO')
-    if (room_id is not None):
-        session['room'] = room_id
+def chatbyid(room_key):
+    if (room_key is not None):
+        session['room_key'] = room_key
         return render_template('chat.html', session = session)
     else:
         return redirect(url_for('home'))
 
-# ("/user/<int:user_id>", methods=['GET'])
+@app.route('/rooms', methods=['GET'])
+@check_auth('name', 'index')
+def getRooms():
+    return jsonify(db.getRoomsByUser(session['uid']))
+
+@app.route('/chats', methods=['GET'])
+@check_auth('name', 'index')
+def getChats():
+    return jsonify(db.getChatsByUser(session['uid']))
+
 @socketio.on('join', namespace='/Chaython')
 def join(message):
-    if (session['room'] is None or session['room'] == ''):
+    if (session['room_key'] is None or session['room_key'] == ''):
         return redirect(url_for('home'))
-    room:str = session.get('room')
-    join_room(room)
-    emit('status', {'msg':  session.get('name') + ' has entered the room.'}, room=room)
+    room_key = session['room_key']
+    join_room(room_key)
+    emit('status', {'msg':  session.get('name') + ' has entered the room.'}, room=room_key)
     return render_template('chat.html', session = session)
 
 @socketio.on('text', namespace='/Chaython')
 def text(message):
-    room = session.get('room')
-    emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room)
+    room_key = session['room_key']
+    emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
 
 @socketio.on('left', namespace='/chat')
 def left(message):
     username = session.get('username')
-    room = session.get('room')
-    leave_room(room)
+    room_key = session['room_key']
+    leave_room(room_key)
     session['room'] = ''
-    emit('status', {'msg': username + ' has left the room.'}, room=room)
+    session['room_key'] = ''
+    emit('status', {'msg': username + ' has left the room.'}, room=room_key)
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
