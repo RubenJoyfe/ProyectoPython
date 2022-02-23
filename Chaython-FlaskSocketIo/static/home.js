@@ -1,4 +1,3 @@
-const url = 'http://127.0.0.1:5000/';
 const rooms_cont = document.getElementById('rooms_cont');
 const chats_cont = document.getElementById('chats_cont');
 
