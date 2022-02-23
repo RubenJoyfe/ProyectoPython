@@ -77,7 +77,6 @@ body{
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 3px;
-    margin-right: 1px;
 }
 .font_strong{
     font-weight: bold;
@@ -92,9 +91,11 @@ body{
     width: 100%;
     background-color: rgba(0, 0, 0, 0.1);
     color: white;
-    margin-bottom: 1px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-color: white;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .chat{
@@ -102,13 +103,24 @@ body{
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 4rem;
-    background-color: rgba(0, 0, 0, 0.1);
+    height: 4.5rem;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-color: rgba(0, 0, 0, 0.1);
 }
 .chat > .chat-info{
     display: flex;
     flex-direction: column;
+    margin: 0 0 0 15px;
 }
+.chat-info > p {
+    margin: 0;
+    padding: 0;
+}
+.title-cont{
+    margin: 5px;
+}
+
 .chat-join{
     display: flex;
     align-items: center;
@@ -121,12 +133,12 @@ body{
     margin: 0 15px 0 0;
     padding: 0;
     color: white;
+    outline: none;
+    transition: 0.15s background-color ease-in-out;
 }
-
-<div class="chat">
-<div class="chat-info">
-    <p class="chat-name"></p>
-    <p class="chat-code"></p>
-</div>
-<button class="chat-join">ENTRAR</button>
-</div>
+.chat-join:hover{
+    background-color: #495fc5;
+}
+.chat-join:focus{
+    outline: none;
+}
