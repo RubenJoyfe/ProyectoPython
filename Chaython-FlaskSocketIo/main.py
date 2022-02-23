@@ -116,6 +116,20 @@ def getRooms():
 def getChats():
     return jsonify(db.getChatsByUser(session['uid']))
 
+@app.route('/msgsroom/<string:id>', methods=['GET'])
+@check_auth('name', 'index')
+def getRoomMsgs(id):
+    if id in [r['_id'] for r in db.getRoomsByUser(session['uid'])]:
+        return jsonify(db.getMessagesByRoom(id))
+    return redirect(url_for('home'))
+
+@app.route('/msgschat/<int:id>', methods=['GET'])
+@check_auth('name', 'index')
+def getChatMsgs(id):
+    if id in [c['_id'] for c in db.getChatsByUser(session['uid'])]:
+        return jsonify(db.getMessagesByChat(id))
+    return redirect(url_for('home'))
+
 @socketio.on('join', namespace='/Chaython')
 def join(message):
     if (session['room_key'] is None or session['room_key'] == ''):
