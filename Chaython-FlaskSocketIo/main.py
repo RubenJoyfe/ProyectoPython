@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'ContraseñaSuperSecretaQuenodeberíaSaberNADIE:=)'
 app.config['SESSION_TYPE'] = 'filesystem'
-JSON_KEY = 'ContraseñaSuperSecretaQuenodeberíaSaberNADIE:=)'
+# JSON_KEY = 'ContraseñaSuperSecretaQuenodeberíaSaberNADIE:=)'
 
 Session(app)
 
@@ -127,8 +127,16 @@ def join(message):
 
 @socketio.on('text', namespace='/Chaython')
 def text(message):
-    room_key = session['room_key']
-    emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
+    room_key = session.get('room_key')
+    chat_key = session.get('chat_key')
+    if room_key is not None:
+        db.createMessageRoom(session['uid'], room_key, message.get("msg"))
+        emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
+    elif chat_key is not None:
+        db.createMessageRoom(session['uid'], chat_key, message.get("msg"))
+        emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=chat_key)
+    else:
+        redirect(url_for('home'))
 
 @socketio.on('left', namespace='/chat')
 def left(message):
