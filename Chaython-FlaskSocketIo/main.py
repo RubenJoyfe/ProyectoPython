@@ -33,6 +33,7 @@ def check_auth(session_item_name:str, redirect_name:str):
                 else: 
                     return f(*args, **kargs)
             except Exception as e:
+                redirect(url_for('logout'))
                 abort(401)
             pass
         return wrapper
@@ -129,6 +130,12 @@ def getChatMsgs(id):
     if id in [c['_id'] for c in db.getChatsByUser(session['uid'])]:
         return jsonify(db.getMessagesByChat(id))
     return redirect(url_for('home'))
+
+# TODO: Numero personal + devolver el usuario
+@app.route('/chat/<int:personalnumber>', methods=['GET'])
+@check_auth('name', 'index')
+def getPersonByPersonalNumber(personalnumber):
+    return jsonify(db.getDocumentById("Users", personalnumber))
 
 @socketio.on('join', namespace='/Chaython')
 def join(message):

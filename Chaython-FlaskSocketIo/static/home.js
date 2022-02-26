@@ -1,6 +1,10 @@
 const rooms_cont = document.getElementById('rooms_cont');
 const chats_cont = document.getElementById('chats_cont');
 
+logout.addEventListener('click', function(){window.location.href = '/logout'});
+addpersonalchat.addEventListener('click', displayAddPersonalChat);
+closepersonalchat.addEventListener('click', displayAddPersonalChat);
+
 fetch("/rooms")
 .then((resp) => resp.json())
 .then(function(data) {
@@ -35,7 +39,7 @@ function buildChatStructure(roomsjs){
         chatstr += "<p class='chat-code'>"+roomsjs[i]['_id']+"</p>"
         chatstr += "</div>"
         chatstr += "<form action='/Chaython' method='POST'>"
-        chatstr += "<button class='chat-join'>ENTRAR</button>"
+        chatstr += "<button class='chat-join default-press-hover'>ENTRAR</button>"
         chatstr += "<input type='hidden' name='room' value='"+roomsjs[i]['_id']+"'>"
         chatstr += "<input type='hidden' value='join' name='room_action'>"
         chatstr += "</form>"
@@ -62,4 +66,43 @@ for (let index = 0; index < 2; index++) {
             document.getElementById('room_action').value = array_actions[index];
         }
     });
+}
+
+
+function displayAddPersonalChat(){
+    addchatcont.classList.toggle('hidden');
+    pchatname.focus();
+    pchatname.value = '';
+}
+
+function findPerson(personalNumber){
+    fetch("/chat/"+personalNumber)
+    .then((resp) => resp.json())
+    .then(function(data) {
+        return checkPerson(data);
+    })
+    .catch(function(error) {
+        console.log(error);
+    });
+    
+}
+
+searchPerson.addEventListener('click', function(){
+    const personalNumber = pchatname.value;
+    if (personalNumber == '') {
+        alert('El número de la persona no puede estar vacio');
+        return;
+    }
+    findPerson(personalNumber)
+});
+
+function checkPerson(p){
+    const person = p;
+    console.log(person);
+        
+    if (person === null) {
+        alert('La persona con el numero indicado no existe');
+        return;
+    }
+    alert('¿Seguro que quiere añadir a '+person['name']+' a su lista de chats privados?');
 }

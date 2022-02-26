@@ -19,9 +19,15 @@
                         <span id="name_letter"></span>
                     </div>
                     <p id="user_name" class="font_strong">{{session['name']}}</p>
+                    <div class="end-session">
+                        <p id="logout" class="font_strong">Cerrar sesión</p>
+                    </div>
                 </div>
                 <div id="chats_cont">
-                    <p class="title-cont">Chats</p>
+                    <div class="chats_title">
+                        <p class="title-cont">Chats</p>
+                        <span id="addpersonalchat" class="add-chat default-press-hover">+</span>
+                    </div>
                 </div>
                 <div id="rooms_cont">
                     <p class="title-cont">Salas</p>
@@ -31,13 +37,26 @@
                 <form class="form-signin" action="{{url_for('chat')}}" method="POST">
                     <h1 class="h2 mb-3 font-weight-strong">Chayton API's Chat</h1>
                     <br>
-                    <div id="chats">{{session['chats']}}</div>
-                    <br>
                     <input type="text" id="RoomName" name="room" class="form-control" placeholder="Sala" required autocomplete="off" autofocus><br>
                     <input type="hidden" id="room_action" value="" name="room_action">
                     <button class="btn btn-lg btn-primary btn-block" value="submit">Crear Sala</button>
                     <button class="btn btn-lg btn-secondary btn-block" value="submit">Unirse a Sala</button>
                 </form>
+            </div>
+        </div>
+        <div id="addchatcont" class="">
+            <div id="addchat" class="personal-chat">
+                <div class="chat-title">
+                    <p class="title-cont">Agregar Chat</p>
+                    <span id="closepersonalchat" class="close-chat default-press-hover">X</span>
+                </div>
+                <div class="chat-cont">
+                    <div class="form-signin">
+                        <input type="text" id="pchatname" name="chat" class="form-control" placeholder="Numero Personal" required autocomplete="off" autofocus>
+                        <br>
+                        <button id="searchPerson" class="btn btn-lg btn-primary btn-block" value="submit">Crear Chat</button>
+                    </div>
+                </div>
             </div>
         </div>
         
