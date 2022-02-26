@@ -137,6 +137,12 @@ def getChatMsgs(id):
 def getPersonByPersonalNumber(personalnumber):
     return jsonify(db.getDocumentById("Users", personalnumber))
 
+@app.route('/chat/add/<int:user_id>', methods=['GET'])
+@check_auth('name', 'index')
+def addPersonalChat(user_id):
+    users = [session['uid'], user_id]
+    return jsonify(db.createChat(users))
+
 @socketio.on('join', namespace='/Chaython')
 def join(message):
     if (session['room_key'] is None or session['room_key'] == ''):

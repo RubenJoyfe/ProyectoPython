@@ -65,6 +65,7 @@ def getMessagesByRoom(roomId):
 
 def createChat(users):
     if len(users) < 2: return -1
+    if users[0] == users[1]: return -2
     if getDocumentById("Users", users[0]) is None or getDocumentById("Users", users[1]) is None: return -2
     users = users[0:2]
     users.sort()

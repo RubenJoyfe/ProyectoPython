@@ -44,7 +44,7 @@
                 </form>
             </div>
         </div>
-        <div id="addchatcont" class="">
+        <div id="addchatcont" class="hidden">
             <div id="addchat" class="personal-chat">
                 <div class="chat-title">
                     <p class="title-cont">Agregar Chat</p>
@@ -54,10 +54,16 @@
                     <div class="form-signin">
                         <input type="text" id="pchatname" name="chat" class="form-control" placeholder="Numero Personal" required autocomplete="off" autofocus>
                         <br>
-                        <button id="searchPerson" class="btn btn-lg btn-primary btn-block" value="submit">Crear Chat</button>
+                        <button id="searchPerson" class="btn btn-lg btn-primary btn-block">Crear Chat</button>
                     </div>
                 </div>
+                <div id="notifier"></div>
             </div>
+            <!-- <div class="addchat-notification">
+                <p>¿Seguro que quiere añadir a %%name%% a su lista de chats privados?</p>
+                <button id="btnaddchat" class="btn btn-lg btn-primary btn-block" value="submit">Agregar</button>
+                <button id="btncanceladdchat" class="btn btn-lg btn-secondary btn-block" value="submit">Cancelar</button>
+            </div> -->
         </div>
         
     </body>

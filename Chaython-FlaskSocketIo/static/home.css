@@ -243,6 +243,37 @@ body{
     align-items: center;
     box-sizing: border-box;
 }
-.close-chat {
+.close-chat{
     font-size: 14px;
+}
+
+#notifier{
+    position: absolute;
+    top: calc(30%);
+    left: -75px;
+}
+
+.addchat-notification{
+    position: absolute;
+    width: 400px;
+    height: fit-content;
+    padding: 15px;
+    background-color: #2a3c8b;
+    border: 1px solid #afbcf8;
+    border-radius: 5px;
+    color: white;
+    transition: top 1.2s ease;
+    top: calc(50% + 150px);
+    animation: slide-down 1s ease;
+    z-index: 1010;
+}
+
+
+@keyframes slide-down {
+    0% {
+        top: -300px;
+    }
+    100% {
+        top: calc(50% + 150px);
+    }
 }
