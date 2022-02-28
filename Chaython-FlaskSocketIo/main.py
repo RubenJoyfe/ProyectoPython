@@ -155,12 +155,23 @@ def addPersonalChat(user_id):
 
 @socketio.on('join', namespace='/Chaython')
 def join(message):
-    if (session.get('room_key') is None or session['room_key'] == ''):
+    wtf = 'Roboto-Regular.ttf'
+    room_key = session.get('room_key') if session.get('room_key') != wtf else ''
+    chat_key = session.get('chat_key') if session.get('chat_key') != wtf else ''
+    if room_key is not None and room_key != '':
+        #roomkey
+        room_key = session['room_key']
+        join_room(room_key)
+        emit('status', {'msg':  session.get('name') + ' has entered the room.'}, room=room_key)
+        return render_template('chat.html', session = session)
+    elif chat_key is not None and chat_key != '':
+        #chatkey
+        chat_key = session['chat_key']
+        join_room(chat_key)
+        emit('status', {'msg':  session.get('name') + ' has entered the chat.'}, room=room_key)
+        return render_template('private.html', session = session)
+    else:
         return redirect(url_for('home'))
-    room_key = session['room_key']
-    join_room(room_key)
-    emit('status', {'msg':  session.get('name') + ' has entered the room.'}, room=room_key)
-    return render_template('chat.html', session = session)
 
 @socketio.on('text', namespace='/Chaython')
 def text(message):
@@ -173,8 +184,7 @@ def text(message):
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
     elif chat_key is not None and chat_key != '':
         print('c:' + chat_key)
-        print(message.get("msg"))
-        print(db.createMessageChat(session['uid'], chat_key, message.get("msg")))
+        db.createMessageChat(session['uid'], int(chat_key), message.get("msg"))
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=chat_key)
     else:
         redirect(url_for('home'))
