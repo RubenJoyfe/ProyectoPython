@@ -20,6 +20,9 @@ db = client.Chaython
 def createMessageChat(userId, chatId, msg, date = datetime.now()):
     chat = getDocumentById("Chats", chatId)
     user = getDocumentById("Users", userId)
+    if chat is None: return -1
+    if user is None: return -2
+    if userId not in chat["users"]: return -3
     if chat is None or user is None or userId not in chat["users"]: return -1
     message = {
         "_id": GetNextId("Messages"),
@@ -34,7 +37,9 @@ def createMessageChat(userId, chatId, msg, date = datetime.now()):
 def createMessageRoom(userId, roomId, msg, date = datetime.now()):
     room = getDocumentById("Rooms", roomId)
     user = getDocumentById("Users", userId)
-    if room is None or user is None or userId not in room["users"]: return -1
+    if room is None: return -1
+    if user is None: return -2
+    if userId not in room["users"]: return -3
     message = {
         "_id": GetNextId("Messages"),
         "user_id": userId,
