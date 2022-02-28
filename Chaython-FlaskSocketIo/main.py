@@ -1,4 +1,5 @@
 from ast import If
+from asyncio.windows_events import NULL
 from getpass import getuser
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort
 from flask_socketio import SocketIO, join_room, leave_room, emit
@@ -163,13 +164,17 @@ def join(message):
 
 @socketio.on('text', namespace='/Chaython')
 def text(message):
-    room_key = session.get('room_key')
-    chat_key = session.get('chat_key')
-    if room_key is not None:
+    wtf = 'Roboto-Regular.ttf'
+    room_key = session.get('room_key') if session.get('room_key') != wtf else ''
+    chat_key = session.get('chat_key') if session.get('chat_key') != wtf else ''
+    if room_key is not None and room_key != '':
+        print('r:' + room_key)
         db.createMessageRoom(session['uid'], room_key, message.get("msg"))
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
-    elif chat_key is not None:
-        db.createMessageRoom(session['uid'], chat_key, message.get("msg"))
+    elif chat_key is not None and chat_key != '':
+        print('c:' + chat_key)
+        print(message.get("msg"))
+        print(db.createMessageChat(session['uid'], chat_key, message.get("msg")))
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=chat_key)
     else:
         redirect(url_for('home'))
