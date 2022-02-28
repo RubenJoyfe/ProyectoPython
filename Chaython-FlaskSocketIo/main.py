@@ -48,7 +48,7 @@ def index():
 @app.route('/home', methods=['GET', 'POST'])
 @check_auth('name', 'index')
 def home():
-    uid = session['uid']
+    # uid = session['uid']
     # session['chats'] = db.getRoomsByUser(uid)
     return render_template('home.html', session = session) # return redirect(url_for('chat'))
 
@@ -93,6 +93,15 @@ def chat():
         return render_template('chat.html', session = session)
     else:
         return redirect(url_for('index'))
+
+@app.route('/Chaython/private', methods=['GET', 'POST'])
+@check_auth('name', 'home')
+def JoinPrivateChat():
+    if (request.form['chat'] is None or request.form['chat'] == ''):
+        return redirect(url_for('home'))
+    session['chat_key'] = request.form['chat']
+    session['chat_name'] = request.form['connect_to']
+    return render_template('private.html', session = session)
 
 @app.route('/Chaython/', methods=['GET'])
 def backToHome():
@@ -145,7 +154,7 @@ def addPersonalChat(user_id):
 
 @socketio.on('join', namespace='/Chaython')
 def join(message):
-    if (session['room_key'] is None or session['room_key'] == ''):
+    if (session.get('room_key') is None or session['room_key'] == ''):
         return redirect(url_for('home'))
     room_key = session['room_key']
     join_room(room_key)
@@ -172,6 +181,8 @@ def left(message):
     leave_room(room_key)
     session['room'] = ''
     session['room_key'] = ''
+    session['chat_key'] = ''
+    session['chat_name'] = ''
     emit('status', {'msg': username + ' has left the room.'}, room=room_key)
 
 @app.route('/logout', methods=['GET', 'POST'])

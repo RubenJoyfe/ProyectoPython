@@ -43,10 +43,10 @@ function buildChatStructure(chatsjs){
         chatstr += "<p class='chat-name font_strong'>"+chatsjs[i]['otherUserName']+"</p>"
         chatstr += "<p class='chat-code'>CHAT PRIVADO</p>"
         chatstr += "</div>"
-        chatstr += "<form action='/Chaython' method='POST'>"
+        chatstr += "<form action='/Chaython/private' method='POST'>"
         chatstr += "<button class='chat-join default-press-hover'>ENTRAR</button>"
-        chatstr += "<input type='hidden' name='room' value='"+chatsjs[i]['_id']+"'>"
-        chatstr += "<input type='hidden' value='join' name='room_action'>"
+        chatstr += "<input type='hidden' name='chat' value='"+chatsjs[i]['_id']+"'>"
+        chatstr += "<input type='hidden' value='"+chatsjs[i]['otherUserName']+"' name='connect_to'>"
         chatstr += "</form>"
         chatstr += "</div>"
         rooms.push(chatstr)

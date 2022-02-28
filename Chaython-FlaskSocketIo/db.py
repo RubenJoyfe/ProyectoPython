@@ -194,10 +194,12 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 # print(getChatsByUser(1))
 
+#print(getDocumentById('Users', getDocumentById('Chats', 1)['users'][0]))
 
 
+# print(getDocumentById('Users', getDocumentById('Chats', 1)['users'][1]))
 
-
+# registerUser("luk", "1234")
 
 
 
