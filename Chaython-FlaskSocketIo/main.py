@@ -53,11 +53,11 @@ def home():
     # session['chats'] = db.getRoomsByUser(uid)
     return render_template('home.html', session = session) # return redirect(url_for('chat'))
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if(session.get('name') is not None):
         return redirect(url_for('home'))
-    elif (request.method=='POST' and request.form['name'] is not None and request.form['password'] is not None):
+    elif (request.form['name'] is not None and request.form['password'] is not None):
         uname = request.form['name']
         pword = request.form['password']
         u = db.logIn(uname, pword)
@@ -72,6 +72,23 @@ def login():
         # jsonify({"name": uname,"token": token}), 200
         return redirect(url_for('home'))
     return redirect(url_for('index'))
+
+@app.route('/register', methods=['POST'])
+def register():
+    if(session.get('name') is not None):
+        return redirect(url_for('home'))
+    elif (request.form['name'] is not None and request.form['password'] is not None):
+        uname = request.form['name']
+        pword = request.form['password']
+        if pword != request.form['password2']:
+            return redirect(url_for('register')+'?error=11')
+        u = db.registerUser(uname, pword)
+        if u is None:
+            return redirect(url_for('register')+'?error=10')
+        session['uid'] = u['_id']
+        session['name'] = u['name']
+        return redirect(url_for('home'))
+    return redirect(url_for('register'))
 
 @app.route('/Chaython', methods=['GET', 'POST'])
 @check_auth('name', 'home')
