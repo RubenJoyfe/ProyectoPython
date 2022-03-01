@@ -150,7 +150,9 @@ def registerUser(name, passwd):
     "name": name,
     "pass": md5(passwd.encode()).hexdigest(),
     }
-    return -1 if db.Users.find_one({'name': name}, {}) != None else db.Users.insert_one(user).inserted_id
+    if db.Users.find_one({'name': name}, {}) != None: return None
+    db.Users.insert_one(user)
+    return user
 
 def logIn(name, passwd):
     return db.Users.find_one({'name': name, 'pass': md5(passwd.encode()).hexdigest()}, {})
