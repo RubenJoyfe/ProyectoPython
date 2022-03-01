@@ -85,6 +85,13 @@ body{
 .font_strong{
     font-weight: bold;
 }
+.user-info{
+    display: flex;
+    flex-direction: column;
+}
+.user-info > p {
+    margin: 0;
+}
 
 #chats_cont,
 #rooms_cont{
