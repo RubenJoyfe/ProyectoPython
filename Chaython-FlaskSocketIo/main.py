@@ -47,7 +47,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/r', methods=['GET', 'POST'])
-def index():
+def reg():
     if(session.get('name') is not None):
         return redirect(url_for('home'))
     return render_template('register.html')
@@ -87,14 +87,14 @@ def register():
         uname = request.form['name']
         pword = request.form['password']
         if pword != request.form['password2']:
-            return redirect(url_for('register')+'?error=11')
+            return redirect(url_for('reg')+'?error=11')
         u = db.registerUser(uname, pword)
         if u is None:
-            return redirect(url_for('register')+'?error=10')
+            return redirect(url_for('reg')+'?error=10')
         session['uid'] = u['_id']
         session['name'] = u['name']
         return redirect(url_for('home'))
-    return redirect(url_for('register'))
+    return redirect(url_for('reg'))
 
 @app.route('/Chaython', methods=['GET', 'POST'])
 @check_auth('name', 'home')
@@ -122,6 +122,8 @@ def chat():
 @check_auth('name', 'home')
 def JoinPrivateChat():
     if (request.form['chat'] is None or request.form['chat'] == ''):
+        return redirect(url_for('home'))
+    if int(request.form['chat']) not in [int(c['_id']) for c in db.getChatsByUser(session['uid'])]:
         return redirect(url_for('home'))
     session['chat_key'] = request.form['chat']
     session['chat_name'] = request.form['connect_to']
@@ -191,7 +193,7 @@ def join(message):
         #chatkey
         chat_key = session['chat_key']
         join_room(chat_key)
-        emit('status', {'msg':  session.get('name') + ' has entered the chat.'}, room=room_key)
+        # emit('status', {'msg':  session.get('name') + ' has entered the chat.'}, room=room_key)
         return render_template('private.html', session = session)
     else:
         return redirect(url_for('home'))

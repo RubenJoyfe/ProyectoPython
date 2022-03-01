@@ -2,7 +2,7 @@
 <html lang="es">
 
     <head>
-        <title>Chayton API's Chat</title>
+        <title>Chaython API's Chat</title>
         <!--Link to CSS -->
         <link href="../static/bootstrap.min.css" rel="stylesheet">
         <link href="../static/style.css" rel="stylesheet">
@@ -10,11 +10,13 @@
 
     <body class="text-center">
         <form class="form-signin" action="{{url_for('register')}}" method="POST">
-            <h1 class="h2 mb-3 font-weight-normal">Chayton API's Chat</h1><br><br>
-            <input type="text" id="username" name="name" class="form-control" placeholder="Username" required autocomplete="off" autofocus><br>
-            <input type="password" id="pass" name="password" class="form-control" placeholder="Password" required autocomplete="off"><br>
-            <input type="password" id="pass2" name="password2" class="form-control" placeholder="Password" required autocomplete="off"><br>
-            <button class="btn btn-lg btn-primary btn-block" value="submit">Start Chat</button>
+            <h1 class="h2 mb-3 font-weight-normal">Chaython APU's Chat</h1><br><br>
+            <input type="text" id="username" name="name" class="form-control" placeholder="Usuario" required autocomplete="off" autofocus><br>
+            <input type="password" id="pass" name="password" class="form-control" placeholder="Contraseña" required autocomplete="off"><br>
+            <input type="password" id="pass2" name="password2" class="form-control" placeholder="Confirmar Contraseña" required autocomplete="off"><br>
+            <button class="btn btn-lg btn-primary btn-block" value="submit">Registrarse</button>
+            <hr class="hr-text" data-content="O">
+            <a href="/">¿Ya tienes cuenta? Inicia Sesión</a>
         </form>
     </body>
     <script>
