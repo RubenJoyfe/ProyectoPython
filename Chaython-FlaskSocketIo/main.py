@@ -46,6 +46,12 @@ def index():
         return redirect(url_for('home'))
     return render_template('index.html')
 
+@app.route('/r', methods=['GET', 'POST'])
+def index():
+    if(session.get('name') is not None):
+        return redirect(url_for('home'))
+    return render_template('register.html')
+
 @app.route('/home', methods=['GET', 'POST'])
 @check_auth('name', 'index')
 def home():
