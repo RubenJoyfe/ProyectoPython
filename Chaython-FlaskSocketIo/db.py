@@ -174,3 +174,8 @@ def GetNextId(collection):
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+
+registerUser("crami", "1234")
+registerUser("luk", "1234")

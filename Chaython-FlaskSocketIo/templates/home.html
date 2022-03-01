@@ -18,7 +18,10 @@
                     <div class="user-profile">
                         <span id="name_letter"></span>
                     </div>
-                    <p id="user_name" class="font_strong">{{session['name']}}</p>
+                    <div class="user-info">
+                        <p id="user_name" class="font_strong">{{session['name']}}</p>
+                        <p>{{session['uid']}}</p>
+                    </div>
                     <div class="end-session">
                         <p id="logout" class="font_strong">Cerrar sesión</p>
                     </div>
