@@ -168,62 +168,7 @@ def getListOf(collection):
     return [p for p in db[collection].find()]
 
 def GetNextId(collection):
-    return 1 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
+    return 1000 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-
-# print(registerUser('Alan1', '1234'))
-# print(registerUser('Alan2', '1234'))
-# print(registerUser('Alan3', '1234'))
-# print(logIn('Alan2', 'uiiiii'))
-# print(getUserId('Alan2'))
-# createRoom('rumsita buena', 3)
-# print(getCollectionById('Users', 4))
-# print(getListOf('Rooms'))
-# print(setRoomActive('MXB3I6', False))
-# print(createRoom('room0', 0))
-# print(createRoom('room1', 0))
-# print(createRoom('room2', 1))
-# print(createRoom('room3', 0))
-# print(json.dumps(getRoomsByUser(1), indent = 4))
-# print(setUserToRoom(2, 'W1TCIQ'))
-
-# print(createMessageChat(11, 1, "AAAAAAAAAAAAAAAA"))
-# print(createMessageChat(1, 22, "BBBBBBBBBBBBBBBB"))
-# print(createMessageChat(2, 1, "CCCCCCCCCCCCCCCC"))
-# print(createMessageChat(1, 1, "DDDDDDDDDDDDDDDD", datetime(2021, 2, 22, 18, 54, 13, 726000)))
-
-# for a in getMessagesByChat(1):
-#     print(a)
-
-# print(getChatsByUser(1))
-
-#print(getDocumentById('Users', getDocumentById('Chats', 1)['users'][0]))
-
-
-# print(getDocumentById('Users', getDocumentById('Chats', 1)['users'][1]))
-
-# registerUser("luk", "1234")
-
-
-
-
-# # Creamos un usuario
-
-# # Borramos el usuario que acabamos de insertar
-# filter = {'nick': 'admin1'}
-# result = db.test.delete_one(filter)
-# print(result.deleted_count)
-
-# # Actualizamos el usuario
-# filter = {'nick': 'admin1'}
-# update = {'$set': {'nick': 'admin', 'login': True}}
-# result = db.test.update_one(filter, update)
-
-# filter = {'user': 'admin'}
-# projection = {}
-# user = db.test.find_one(filter, projection)
-# print(user)
-
-#
