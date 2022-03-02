@@ -210,3 +210,7 @@ def GetNextId(collection):
 # print(getDocumentById('Users', i))
 # print(createRoom('Test', ObjectId('621fae4e8d9e366813d56fba'))['code'])
 # print(type(createChat([1000,1001])))
+# print(createRoom('aaa', '621fb0090a7a957d724b969f'))
+# print(createRoom('bbb', '621fb0090a7a957d724b969f'))
+# print(createRoom('ccc', '621fb0090a7a957d724b969f'))
+# print(getRoomsByUser('621fb0090a7a957d724b969f'))
