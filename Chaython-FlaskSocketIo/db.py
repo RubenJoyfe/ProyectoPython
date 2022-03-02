@@ -37,9 +37,9 @@ def createMessageChat(userId, chatId, msg, date = datetime.now()):
     }
     return db.Messages.insert_one(message).inserted_id
 
-def createMessageRoom(userId, roomId, msg, date = datetime.now()):
+def createMessageRoom(userId, roomKey, msg, date = datetime.now()):
     userId = ObjectId(userId)
-    roomId = ObjectId(roomId)
+    roomId = getRoomByCode(roomKey)['_id']
     room = getDocumentById("Rooms", roomId)
     user = getDocumentById("Users", userId)
     if room is None: return -1
@@ -63,8 +63,8 @@ def getMessagesByChat(chatId):
         m["name"] = getDocumentById("Users", m["user_id"])["name"]
     return l
 
-def getMessagesByRoom(roomId):
-    roomId = ObjectId(roomId)
+def getMessagesByRoom(roomKey):
+    roomId = getRoomByCode(roomKey)['_id']
     if getDocumentById("Rooms", roomId) is None: return -1
     l = [ m for m in db.Messages.find({'room_id': roomId}, {})]
     l.sort(key=operator.itemgetter('date'))
@@ -140,7 +140,7 @@ def getRoomsByUser(userId):
 
 def setUserToRoom(userId, roomKey, remove = False):
     userId = ObjectId(userId)
-    roomId = getRoomByCode(roomKey)
+    roomId = getRoomByCode(roomKey)['_id']
     room = getDocumentById('Rooms', roomId)
     if room is None or getDocumentById('Users', userId) is None:
         return -1
@@ -218,3 +218,4 @@ def GetNextId(collection):
 # print(createMessageRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', 'Mensajeeeeeee'))
 # print(createMessageRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', 'Mensajeeeeeee'))
 # print(json.dumps(dumps(getMessagesByRoom('621fb407decc38faa96188b0')),))
+# print(setUserToRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', remove = False))
