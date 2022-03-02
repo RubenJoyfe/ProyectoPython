@@ -138,9 +138,9 @@ def getRoomsByUser(userId):
             rooms.append(r)
     return rooms
 
-def setUserToRoom(userId, roomId, remove = False):
+def setUserToRoom(userId, roomKey, remove = False):
     userId = ObjectId(userId)
-    roomId = ObjectId(roomId)
+    roomId = getRoomByCode(roomKey)
     room = getDocumentById('Rooms', roomId)
     if room is None or getDocumentById('Users', userId) is None:
         return -1
@@ -214,3 +214,7 @@ def GetNextId(collection):
 # print(createRoom('bbb', '621fb0090a7a957d724b969f'))
 # print(createRoom('ccc', '621fb0090a7a957d724b969f'))
 # print(getRoomsByUser('621fb0090a7a957d724b969f'))
+# print(createMessageRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', 'Mensajeeeeeee'))
+# print(createMessageRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', 'Mensajeeeeeee'))
+# print(createMessageRoom('621fb0090a7a957d724b969f', '621fb407decc38faa96188b0', 'Mensajeeeeeee'))
+# print(json.dumps(dumps(getMessagesByRoom('621fb407decc38faa96188b0')),))
