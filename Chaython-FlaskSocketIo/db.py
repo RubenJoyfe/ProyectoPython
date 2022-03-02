@@ -96,6 +96,7 @@ def getChatsByUser(userId):
 
 #--------------------------------------------------------- Rooms ---------------------------------------------------------
 def createRoom(name, firstUserId):
+    firstUserId = ObjectId(firstUserId)
     if getDocumentById('Users', firstUserId) == None:
         return -1
 
@@ -113,12 +114,14 @@ def createRoom(name, firstUserId):
     return getDocumentById("Rooms", id)
 
 def setRoomActive(roomId, active = True):
+    roomId = ObjectId(roomId)
     room = getDocumentById('Rooms', roomId)
     if room == None: return -1
     room['active'] = active
     return  db.Rooms.update_one({'_id': roomId}, {'$set': room}).raw_result
 
 def getRoomsByUser(userId):
+    userId = ObjectId(userId)
     rooms = []
     for r in db.Rooms.find():
         if userId in r['users']:
@@ -126,6 +129,8 @@ def getRoomsByUser(userId):
     return rooms
 
 def setUserToRoom(userId, roomId, remove = False):
+    userId = ObjectId(userId)
+    roomId = ObjectId(roomId)
     room = getDocumentById('Rooms', roomId)
     if room is None or getDocumentById('Users', userId) is None:
         return -1
@@ -139,6 +144,7 @@ def setUserToRoom(userId, roomId, remove = False):
     return  db.Rooms.update_one({'_id': roomId}, {'$set': room}).raw_result
 
 def changeRoomName(roomId, name):
+    roomId = ObjectId(roomId)
     room = getDocumentById('Rooms', roomId)
     if room is None: return -1
     room["name"] = name
@@ -157,9 +163,7 @@ def registerUser(name, passwd):
     "name": name,
     "pass": md5(passwd.encode()).hexdigest(),
     }
-    print(db.Users.find_one({'name': name}, {}))
     if db.Users.find_one({'name': name}, {}) != None: return None
-    print('---')
     db.Users.insert_one(user)
     return user
 
@@ -171,7 +175,7 @@ def getUserId(name):
     return -1 if user == None else user['_id']
 
 def GetNextCode():
-    return 1000 if db.Users.count_documents({}) == 0 else db.Users.find().sort('_id', -1).limit(1)[0]['_id'] + 1
+    return 1000 if db.Users.count_documents({}) == 0 else db.Users.find().sort('code', -1).limit(1)[0]['code'] + 1
 
 
 #--------------------------------------------------------- Otro ---------------------------------------------------------
@@ -186,8 +190,9 @@ def GetNextId(collection):
 
 
 ####################################
-# u = registerUser("test2", "1234")
-# print(u['_id'])
+# u = registerUser("test3", "1234")
+# print(u)
+# print(dumps(u['_id']))
 # i = str(u['_id'])
 # print(getDocumentById('Users', i))
-
+# print(createRoom('Test', ObjectId('621fae4e8d9e366813d56fba'))['code'])
