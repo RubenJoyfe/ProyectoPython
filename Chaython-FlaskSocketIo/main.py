@@ -11,6 +11,8 @@ from itsdangerous import exc
 import requests, json, os, jwt
 #Mongo DB manager
 import db
+from bson.json_util import dumps
+from bson.objectid import ObjectId
 
 
 app = Flask(__name__)
@@ -74,6 +76,7 @@ def login():
         # session['token'] = token
         session['uid'] = u['_id']
         session['name'] = uname
+        session['user_code'] = u['code']
         # session['chats'] = db.getRoomsByUser(u['_id'])
         # jsonify({"name": uname,"token": token}), 200
         return redirect(url_for('home'))
@@ -93,6 +96,7 @@ def register():
             return redirect(url_for('reg')+'?error=10')
         session['uid'] = u['_id']
         session['name'] = u['name']
+        session['user_code'] = u['code']
         return redirect(url_for('home'))
     return redirect(url_for('reg'))
 
@@ -102,8 +106,10 @@ def chat():
     if (request.form['room'] is not None and request.form['room_action'] is not None):
         session['room'] = request.form['room']
         room_action = request.form['room_action']
+        print(session['uid'])
         if(room_action == 'create'):
-            session['room_key'] = db.createRoom(session['room'],session['uid'])
+            session['room_key'] = db.createRoom(session['room'],session['uid'])['code']
+            print(session['room_key'])
         elif(room_action == 'join'):
             session['room_key'] = session['room']
             res = db.setUserToRoom(session['uid'], session['room_key'])
@@ -145,12 +151,12 @@ def chatbyid(room_key):
 @app.route('/rooms', methods=['GET'])
 @check_auth('name', 'index')
 def getRooms():
-    return jsonify(db.getRoomsByUser(session['uid']))
+    return dumps(db.getRoomsByUser(session['uid']))
 
 @app.route('/chats', methods=['GET'])
 @check_auth('name', 'index')
 def getChats():
-    return jsonify(db.getChatsByUser(session['uid']))
+    return dumps(db.getChatsByUser(session['uid']))
 
 @app.route('/msgsroom/<string:id>', methods=['GET'])
 @check_auth('name', 'index')
@@ -172,10 +178,10 @@ def getChatMsgs(id):
 def getPersonByPersonalNumber(personalnumber):
     return jsonify(db.getDocumentById("Users", personalnumber))
 
-@app.route('/chat/add/<int:user_id>', methods=['GET'])
+@app.route('/chat/add/<int:user_code>', methods=['GET'])
 @check_auth('name', 'index')
-def addPersonalChat(user_id):
-    users = [session['uid'], user_id]
+def addPersonalChat(user_code):
+    users = [session['user_code'], user_code]
     return jsonify(db.createChat(users))
 
 @socketio.on('join', namespace='/Chaython')
