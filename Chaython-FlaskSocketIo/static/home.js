@@ -36,6 +36,7 @@ function innerHTMLTo(conteiner, elements){
 // TODO: Cambiar metodos para llamar a un chat privado (hacer el metodo en python)
 function buildChatStructure(chatsjs){
     let chatstr;
+    // console.log(chatsjs[0]['_id']['$oid']);
     let rooms = []
     for (let i = 0; i < chatsjs.length; i++) {
         chatstr = "<div class='chat'>"
@@ -45,7 +46,7 @@ function buildChatStructure(chatsjs){
         chatstr += "</div>"
         chatstr += "<form action='/Chaython/private' method='POST'>"
         chatstr += "<button class='chat-join default-press-hover'>ENTRAR</button>"
-        chatstr += "<input type='hidden' name='chat' value='"+chatsjs[i]['_id']+"'>"
+        chatstr += "<input type='hidden' name='chat' value='"+chatsjs[i]['_id']['$oid']+"'>"
         chatstr += "<input type='hidden' value='"+chatsjs[i]['otherUserName']+"' name='connect_to'>"
         chatstr += "</form>"
         chatstr += "</div>"

@@ -106,18 +106,15 @@ def chat():
     if (request.form['room'] is not None and request.form['room_action'] is not None):
         session['room'] = request.form['room']
         room_action = request.form['room_action']
-        print(session['uid'])
         if(room_action == 'create'):
             session['room_key'] = db.createRoom(session['room'],session['uid'])['code']
-            print(session['room_key'])
         elif(room_action == 'join'):
             session['room_key'] = session['room']
             res = db.setUserToRoom(session['uid'], session['room_key'])
             if(res == -1):
                 return redirect(url_for('home'))
-            roomInfo = db.getDocumentById('Rooms', session['room_key'])
+            roomInfo = db.getRoomByCode(session['room_key'])
             session['room'] = roomInfo['name']
-
         return render_template('chat.html', session = session)
     elif (session.get('room_key') is not None and session.get('room_key') != ''):
         return render_template('chat.html', session = session)
@@ -129,7 +126,7 @@ def chat():
 def JoinPrivateChat():
     if (request.form['chat'] is None or request.form['chat'] == ''):
         return redirect(url_for('home'))
-    if int(request.form['chat']) not in [int(c['_id']) for c in db.getChatsByUser(session['uid'])]:
+    if str(request.form['chat']) not in [str(c['_id']) for c in db.getChatsByUser(session['uid'])]:
         return redirect(url_for('home'))
     session['chat_key'] = request.form['chat']
     session['chat_name'] = request.form['connect_to']
@@ -161,28 +158,28 @@ def getChats():
 @app.route('/msgsroom/<string:id>', methods=['GET'])
 @check_auth('name', 'index')
 def getRoomMsgs(id):
-    if id in [r['_id'] for r in db.getRoomsByUser(session['uid'])]:
-        return jsonify(db.getMessagesByRoom(id))
+    if id in [r['code'] for r in db.getRoomsByUser(session['uid'])]:
+        return dumps(db.getMessagesByRoom(id))
     return redirect(url_for('home'))
 
-@app.route('/msgschat/<int:id>', methods=['GET'])
+@app.route('/msgschat/<string:id>', methods=['GET'])
 @check_auth('name', 'index')
 def getChatMsgs(id):
-    if id in [c['_id'] for c in db.getChatsByUser(session['uid'])]:
-        return jsonify(db.getMessagesByChat(id))
+    if id in [str(c['_id']) for c in db.getChatsByUser(session['uid'])]:
+        return dumps(db.getMessagesByChat(id))
     return redirect(url_for('home'))
 
 # TODO: Numero personal + devolver el usuario
 @app.route('/chat/<int:personalnumber>', methods=['GET'])
 @check_auth('name', 'index')
 def getPersonByPersonalNumber(personalnumber):
-    return jsonify(db.getDocumentById("Users", personalnumber))
+    return dumps(db.getUserByCode(personalnumber))
 
 @app.route('/chat/add/<int:user_code>', methods=['GET'])
 @check_auth('name', 'index')
 def addPersonalChat(user_code):
     users = [session['user_code'], user_code]
-    return jsonify(db.createChat(users))
+    return dumps(db.createChat(users))
 
 @socketio.on('join', namespace='/Chaython')
 def join(message):
@@ -215,7 +212,7 @@ def text(message):
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=room_key)
     elif chat_key is not None and chat_key != '':
         print('c:' + chat_key)
-        db.createMessageChat(session['uid'], int(chat_key), message.get("msg"))
+        db.createMessageChat(session['uid'], chat_key, message.get("msg"))
         emit('message', {'msg': session.get('name') + ' : ' + message['msg']}, room=chat_key)
     else:
         redirect(url_for('home'))

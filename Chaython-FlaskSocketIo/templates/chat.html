@@ -21,6 +21,7 @@
                 });
                 
                 function CargarMensajes(mssgs){
+                    console.log(mssgs);
                     for (var i = 0; i < mssgs.length; i++) {
                         // console.log(mssgs[i]['name'] + ": " + mssgs[i]['message'])
                         $('#chat').val($('#chat').val() + mssgs[i]['name'] + ": " + mssgs[i]['message'] + '\n');
