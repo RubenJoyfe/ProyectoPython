@@ -20,6 +20,8 @@ db = client.Chaython
 #--------------------------------------------------------- Messages ---------------------------------------------------------
 
 def createMessageChat(userId, chatId, msg, date = datetime.now()):
+    userId = ObjectId(userId)
+    chatId = ObjectId(chatId)
     chat = getDocumentById("Chats", chatId)
     user = getDocumentById("Users", userId)
     if chat is None: return -1
@@ -36,6 +38,8 @@ def createMessageChat(userId, chatId, msg, date = datetime.now()):
     return db.Messages.insert_one(message).inserted_id
 
 def createMessageRoom(userId, roomId, msg, date = datetime.now()):
+    userId = ObjectId(userId)
+    roomId = ObjectId(roomId)
     room = getDocumentById("Rooms", roomId)
     user = getDocumentById("Users", userId)
     if room is None: return -1
@@ -51,6 +55,7 @@ def createMessageRoom(userId, roomId, msg, date = datetime.now()):
     return db.Messages.insert_one(message).inserted_id
 
 def getMessagesByChat(chatId):
+    chatId = ObjectId(chatId)
     if getDocumentById("Chats", chatId) is None: return -1
     l = [ m for m in db.Messages.find({'chat_id': chatId}, {})]
     l.sort(key=operator.itemgetter('date'))
@@ -59,6 +64,7 @@ def getMessagesByChat(chatId):
     return l
 
 def getMessagesByRoom(roomId):
+    roomId = ObjectId(roomId)
     if getDocumentById("Rooms", roomId) is None: return -1
     l = [ m for m in db.Messages.find({'room_id': roomId}, {})]
     l.sort(key=operator.itemgetter('date'))
@@ -71,8 +77,11 @@ def getMessagesByRoom(roomId):
 def createChat(users):
     if len(users) < 2: return -1
     if users[0] == users[1]: return -2
-    if getDocumentById("Users", users[0]) is None or getDocumentById("Users", users[1]) is None: return -2
-    users = users[0:2]
+    users[0] = getUserByCode(users[0])
+    users[1] = getUserByCode(users[1])
+    if users[0] is None or users[1] is None: return -2
+    users[0] = users[0]['_id']
+    users[1] = users[1]['_id']
     users.sort()
 
     chat = db.Chats.find_one({'users': users}, {})
@@ -85,6 +94,7 @@ def createChat(users):
     return getDocumentById("Chats", id)
 
 def getChatsByUser(userId):
+    userId = ObjectId(userId)
     chats = []
     for c in db.Chats.find():
         if userId in c['users']:
@@ -174,6 +184,9 @@ def getUserId(name):
     user = db.Users.find_one({'name': name}, {})
     return -1 if user == None else user['_id']
 
+def getUserByCode(code):
+    return db.Users.find_one({'code': code}, {})
+
 def GetNextCode():
     return 1000 if db.Users.count_documents({}) == 0 else db.Users.find().sort('code', -1).limit(1)[0]['code'] + 1
 
@@ -196,3 +209,8 @@ def GetNextId(collection):
 # i = str(u['_id'])
 # print(getDocumentById('Users', i))
 # print(createRoom('Test', ObjectId('621fae4e8d9e366813d56fba'))['code'])
+# print(type(createChat([1000,1001])))
+# print(createRoom('aaa', '621fb0090a7a957d724b969f'))
+# print(createRoom('bbb', '621fb0090a7a957d724b969f'))
+# print(createRoom('ccc', '621fb0090a7a957d724b969f'))
+# print(getRoomsByUser('621fb0090a7a957d724b969f'))
