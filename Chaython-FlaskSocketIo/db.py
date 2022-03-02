@@ -10,6 +10,8 @@ from textwrap import indent
 from turtle import update
 from unittest import result
 from pymongo import MongoClient
+from bson.objectid import ObjectId
+from bson.json_util import dumps
 
 client = MongoClient('mongodb://localhost:27017/?readPreference=primary&appname=MongoDB+Compass&ssl=false')
 db = client.Chaython
@@ -25,7 +27,6 @@ def createMessageChat(userId, chatId, msg, date = datetime.now()):
     if userId not in chat["users"]: return -3
     if chat is None or user is None or userId not in chat["users"]: return -1
     message = {
-        "_id": GetNextId("Messages"),
         "user_id": userId,
         "chat_id": chatId,
         "room_id": None,
@@ -41,7 +42,6 @@ def createMessageRoom(userId, roomId, msg, date = datetime.now()):
     if user is None: return -2
     if userId not in room["users"]: return -3
     message = {
-        "_id": GetNextId("Messages"),
         "user_id": userId,
         "chat_id": None,
         "room_id": roomId,
@@ -79,10 +79,10 @@ def createChat(users):
     if chat is not None: return chat["_id"]
 
     chat = {
-        "_id": GetNextId("Chats"),
         "users": users
     }
-    return db.Chats.insert_one(chat).inserted_id
+    id = db.Chats.insert_one(chat).inserted_id
+    return getDocumentById("Chats", id)
 
 def getChatsByUser(userId):
     chats = []
@@ -99,17 +99,18 @@ def createRoom(name, firstUserId):
     if getDocumentById('Users', firstUserId) == None:
         return -1
 
-    roomId = id_generator()
-    while(getDocumentById('Rooms', roomId) != None):
-        roomId = id_generator()
+    roomCode = code_generator()
+    while(getDocumentById('Rooms', roomCode) != None):
+        roomCode = code_generator()
 
     room = {
-        "_id": roomId,
+        "code": roomCode,
         "name": name,
         "users": [firstUserId],
         "active": True
     }
-    return db.Rooms.insert_one(room).inserted_id
+    id = db.Rooms.insert_one(room)
+    return getDocumentById("Rooms", id)
 
 def setRoomActive(roomId, active = True):
     room = getDocumentById('Rooms', roomId)
@@ -143,14 +144,22 @@ def changeRoomName(roomId, name):
     room["name"] = name
     return  db.Rooms.update_one({'_id': roomId}, {'$set': room}).raw_result
 
+def code_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+def getRoomByCode(code):
+    return db.Rooms.find_one({'code': code}, {})
+
 #--------------------------------------------------------- Users ---------------------------------------------------------
 def registerUser(name, passwd):
     user =  {
-    "_id": GetNextId('Users'),
+    "code": GetNextCode(),
     "name": name,
     "pass": md5(passwd.encode()).hexdigest(),
     }
+    print(db.Users.find_one({'name': name}, {}))
     if db.Users.find_one({'name': name}, {}) != None: return None
+    print('---')
     db.Users.insert_one(user)
     return user
 
@@ -160,6 +169,9 @@ def logIn(name, passwd):
 def getUserId(name):
     user = db.Users.find_one({'name': name}, {})
     return -1 if user == None else user['_id']
+
+def GetNextCode():
+    return 1000 if db.Users.count_documents({}) == 0 else db.Users.find().sort('_id', -1).limit(1)[0]['_id'] + 1
 
 
 #--------------------------------------------------------- Otro ---------------------------------------------------------
@@ -172,10 +184,10 @@ def getListOf(collection):
 def GetNextId(collection):
     return 1000 if db[collection].count_documents({}) == 0 else db[collection].find().sort('_id', -1).limit(1)[0]['_id'] + 1
 
-def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
 
+####################################
+# u = registerUser("test2", "1234")
+# print(u['_id'])
+# i = str(u['_id'])
+# print(getDocumentById('Users', i))
 
-
-registerUser("crami", "1234")
-registerUser("luk", "1234")
