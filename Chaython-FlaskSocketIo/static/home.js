@@ -61,11 +61,11 @@ function buildRoomStructure(roomsjs){
         chatstr = "<div class='chat'>"
         chatstr += "<div class='chat-info'>"
         chatstr += "<p class='chat-name font_strong'>"+roomsjs[i]['name']+"</p>"
-        chatstr += "<p class='chat-code'>"+roomsjs[i]['_id']+"</p>"
+        chatstr += "<p class='chat-code'>"+roomsjs[i]['code']+"</p>"
         chatstr += "</div>"
         chatstr += "<form action='/Chaython' method='POST'>"
         chatstr += "<button class='chat-join default-press-hover'>ENTRAR</button>"
-        chatstr += "<input type='hidden' name='room' value='"+roomsjs[i]['_id']+"'>"
+        chatstr += "<input type='hidden' name='room' value='"+roomsjs[i]['code']+"'>"
         chatstr += "<input type='hidden' value='join' name='room_action'>"
         chatstr += "</form>"
         chatstr += "</div>"
@@ -110,7 +110,7 @@ function checkPerson(p){
 }
 
 function addPrivateChat(user){
-    fetch("/chat/add/"+user._id)
+    fetch("/chat/add/"+user.code)
     .then((resp) => resp.json())
     .then(function(data) {
         if (data == -2){

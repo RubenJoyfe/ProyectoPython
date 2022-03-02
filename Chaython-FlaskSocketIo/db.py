@@ -110,7 +110,7 @@ def createRoom(name, firstUserId):
         "users": [firstUserId],
         "active": True
     }
-    id = db.Rooms.insert_one(room)
+    id = db.Rooms.insert_one(room).inserted_id
     return getDocumentById("Rooms", id)
 
 def setRoomActive(roomId, active = True):
