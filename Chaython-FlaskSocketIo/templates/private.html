@@ -43,16 +43,28 @@
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
                 $('#send').click(function(e) {
-                        text = $('#text').val();
-                        $('#text').val('');
-                        socket.emit('text', {msg: text});
+                    sendMessage();
                 });
+                SendMessageIfEnter();
             });
             function leave_room() {
                 socket.emit('left', {}, function() {
                     socket.disconnect();
                     window.location.href = "{{ url_for('home') }}";
                 });
+            }
+            function SendMessageIfEnter(){
+                $('#text').keypress(function (e) {
+                    if (e.which == 13) {
+                        sendMessage();
+                    }
+                });
+            }
+            function sendMessage(){
+                text = $('#text').val();
+                if (text==''){return;}
+                $('#text').val('');
+                socket.emit('text', {msg: text});
             }
         </script>
     </head>
@@ -63,7 +75,7 @@
         <h2>Chatting With: {{session['chat_name']}}</h2>
         <!-- <h5>Chat Key: {{session['chat_key']}}</h5> -->
         <br>
-        <textarea id="chat" cols="70" rows="10" placeholder="No messages yet. Start one..."></textarea><br/><br/>
+        <textarea id="chat" cols="70" rows="10" placeholder="No messages yet. Start one..." disabled></textarea><br/><br/>
         <input type="text" id="text" size="60" placeholder="Enter your message here" />
         <button type="button" id="send" class="btn btn-success">SEND</button><br/><br/>
         <center><button type="button" class="btn btn-danger" onclick=leave_room()>Leave this Chat</button></center>
