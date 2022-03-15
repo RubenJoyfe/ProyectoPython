@@ -217,16 +217,21 @@ def text(message):
     else:
         redirect(url_for('home'))
 
-@socketio.on('left', namespace='/chat')
+@socketio.on('left', namespace='/Chaython')
 def left(message):
     username = session.get('username')
-    room_key = session['room_key']
+    room_key = ''
+    chat_key = ''
+    if(session.get('room_key') is not None):
+        room_key = session['room_key']
+    if(session.get('chat_key') is not None):
+        chat_key = session['chat_key']
     leave_room(room_key)
+    leave_room(chat_key)
     session['room'] = ''
     session['room_key'] = ''
     session['chat_key'] = ''
     session['chat_name'] = ''
-    emit('status', {'msg': username + ' has left the room.'}, room=room_key)
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
